@@ -2,6 +2,7 @@
 % AY '25 SPR
 % Developers: Julian Shah | Nathaniel Banse
 %% LEGEND
+
 % VARIABLES
 % u: symbolic variable in equations
 % x: symbolic equation for i_hat position
@@ -10,8 +11,8 @@
 % MAX_WHEEL_SPEED: the maximum wheel speed of the neatos
 % WHEEL_BASE: the distance between neato wheels
 % tu_vals: u values to plot tangents and normals at
-% vx: symbolic x velocity equation
-% vy: symbolic y velocity equation
+% dx_du: symbolic x velocity 
+% dy_du: symbolic y velocityequation equation
 % v_mag: symbolic velocity magnitude equation
 % tx: symbolic normalized x tangent component equation
 % ty: symbolic normalized y tangent component equation
@@ -29,6 +30,7 @@
 % PLOTS
 
 %% DEFINE CONSTANTS
+
 % define parametric functions for rainbow road track
 syms u
 x = 0.3960 * cos(2.65 * (u + 1.4));
@@ -49,13 +51,13 @@ tny = double(subs(y, u, tu_vals));
 
 % SOLVE FOR TANGENTS
 % differentiate x and y functions
-vx = diff(x);
-vy = diff(y);
+dx_du = diff(x);
+dy_du = diff(y);
 % find magnitude of v
-v_mag = sqrt(vx^2 + vy^2);
+v_mag = sqrt(dx_du^2 + dy_du^2);
 % get x and y tangent equations
-tx = vx / v_mag;
-ty = vy / v_mag;
+tx = dx_du / v_mag;
+ty = dy_du / v_mag;
 % substitute tu_vals into tx and ty
 tx_vals = double(subs(tx, u, tu_vals));
 ty_vals = double(subs(ty, u, tu_vals));
@@ -73,7 +75,7 @@ ny = dty / dt_mag;
 nx_vals = double(subs(nx, u, tu_vals));
 ny_vals = double(subs(ny, u, tu_vals));
 
-%GRAPH
+% GRAPH
 u_plotting = linspace(u_scope(1), u_scope(2));
 x_vals = double(subs(x, u, u_plotting));
 y_vals = double(subs(y, u, u_plotting));
@@ -97,3 +99,64 @@ for i = 2:length(tu_vals)-1
 
 end
 hold off
+
+%% DEFINE FUNCTIONS
+
+% Time parameters
+T = 10; % Total time (s), adjust if wheel speeds exceed 0.3 m/s
+t = u * T / 3.2;
+du_dt = 3.2 / T;
+
+% Linear speed
+v = v_mag * du_dt;
+
+% Angular velocity via curvature
+d2x_du2 = diff(dx_du);
+d2y_du2 = diff(dy_du);
+cross_mag = dx_du * d2y_du2 - dy_du * d2x_du2;
+kappa = cross_mag / (v_mag^3);
+omega = v .* kappa;
+
+% Wheel velocities
+vr = v + (omega * WHEEL_BASE) / 2;
+vl = v - (omega * WHEEL_BASE) / 2;
+
+%% PLOT PLANNED LINEAR SPEED AND ANGULAR VELOCITY VS. TIME
+
+% Evaluating functions for plotting
+t_vals = double(subs(t, u, u_plotting));
+v_vals = double(subs(v, u, u_plotting));
+omega_vals = double(subs(omega, u, u_plotting));
+vr_vals = double(subs(vr, u, u_plotting));
+vl_vals = double(subs(vl, u, u_plotting));
+
+% Plot linear and angular velocities
+figure('Position', [100, 100, 600, 400]);
+subplot(2, 1, 1);
+plot(t_vals, v_vals, 'b-', 'LineWidth', 2);
+xlabel('Time (s)'); ylabel('Linear Speed (m/s)');
+title('Planned Linear Speed');
+grid on;
+subplot(2, 1, 2);
+plot(t_vals, omega_vals, 'r-', 'LineWidth', 2);
+xlabel('Time (s)'); ylabel('Angular Velocity (rad/s)');
+title('Planned Angular Velocity');
+grid on;
+sgtitle('Neatokart Center of Mass Velocities');
+caption = sprintf('Planned linear speed and angular velocity of the Neatokart over %d s, derived from the Rainbow Road curve.', T);
+text(0, -0.1, caption, 'FontSize', 8, 'HorizontalAlignment', 'center', 'Units', 'normalized');
+
+% Plot wheel velocities
+figure('Position', [700, 100, 600, 400]);
+plot(t_vals, vr_vals, 'b-', 'LineWidth', 2, 'DisplayName', 'Right Wheel');
+hold on;
+plot(t_vals, vl_vals, 'r-', 'LineWidth', 2, 'DisplayName', 'Left Wheel');
+plot([0 T], [max_speed max_speed], 'k--', 'DisplayName', 'Speed Limit');
+plot([0 T], [-max_speed -max_speed], 'k--', 'HandleVisibility', 'off');
+xlabel('Time (s)'); ylabel('Wheel Velocity (m/s)');
+title('Planned Wheel Velocities');
+legend('Location', 'best');
+grid on;
+caption = sprintf('Left and right wheel velocities over %d s, constrained by ±0.3 m/s, for navigating Rainbow Road.', T);
+text(T/2, -0.45, caption, 'FontSize', 8, 'HorizontalAlignment', 'center');
+hold off;
