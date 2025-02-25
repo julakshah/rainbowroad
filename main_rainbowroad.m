@@ -1,3 +1,4 @@
+clear;
 %% Main script for QEA2 rainbow road project
 % AY '25 SPR
 % Developers: Julian Shah | Nathaniel Banse
@@ -103,7 +104,7 @@ hold off
 %% DEFINE FUNCTIONS
 
 % Time parameters
-T = 10; % Total time (s), adjust if wheel speeds exceed 0.3 m/s
+T = 30; % Total time (s), adjust if wheel speeds exceed 0.3 m/s
 t = u * T / 3.2;
 du_dt = 3.2 / T;
 
