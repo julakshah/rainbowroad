@@ -59,6 +59,7 @@ u_scope = [0, 3.2];
 
 MAX_WHEEL_SPEED = .3; % m/s
 WHEEL_BASE = .245; % meters
+IP_STRING = '192.00.00.00'
 
 %% PLOT PATH/TANGENT/NORMAL
 
@@ -182,3 +183,26 @@ grid on;
 caption = sprintf('Left and right wheel velocities over %d s, constrained by ±0.3 m/s, for navigating Rainbow Road.', T);
 text(T/2, -0.45, caption, 'FontSize', 8, 'HorizontalAlignment', 'center');
 hold off;
+
+%% NEATO MOVE
+
+% connect to neato
+neato3.connect(IP_STRING);
+
+% start the timer
+tic;
+% loop until 60 seconds have passed
+while toc<=60
+    % set t_in to the amount of time that has elapsed
+    t_in = toc;
+
+    % use MATLAB's linear interpolation to approximate
+    % vl(t) and vr(t) at t=t_in
+    vl_out = interp1(t_vals,vl_vals,t_in);
+    vr_out = interp1(t_vals,vr_vals,t_in);
+    
+    neato3.setVelocities(vl_out, vr_out)
+end
+
+
+
