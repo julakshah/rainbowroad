@@ -4,28 +4,46 @@ clear;
 % Developers: Julian Shah | Nathaniel Banse
 %% LEGEND
 
-% VARIABLES
-% u: symbolic variable in equations
-% x: symbolic equation for i_hat position
-% y: symbolic equation for j_hat position
-% u_scope: the scope of u that the rainbow road has
-% MAX_WHEEL_SPEED: the maximum wheel speed of the neatos
-% WHEEL_BASE: the distance between neato wheels
-% tu_vals: u values to plot tangents and normals at
-% dx_du: symbolic x velocity 
-% dy_du: symbolic y velocity equation equation
-% v_mag: symbolic velocity magnitude equation
-% tx: symbolic normalized x tangent component equation
-% ty: symbolic normalized y tangent component equation
-% tx_vals: vector containing solved x tangent components
-% ty_vals: vector containing solved y tangent components
-% dtx: symbolic derivative of tx
-% dty: symbolic derivative of ty
-% dt_mag: symbolic tangent magnitude equation
-% nx: symbolic normal vector x component
-% ny: symbolic normal vector y component
-% nx_vals: vector containing solved x normal components
-% ny_vals: vector containing solved y normal components
+%{
+VARIABLES
+u: symbolic variable in equations
+x: symbolic equation for i_hat position
+y: symbolic equation for j_hat position
+u_scope: the scope of u that the rainbow road has
+MAX_WHEEL_SPEED: the maximum wheel speed of the neatos
+WHEEL_BASE: the distance between neato wheels
+tu_vals: u values to plot tangents and normals at
+dx_du: symbolic x velocity 
+dy_du: symbolic y velocity equation equation
+v_mag: symbolic velocity magnitude equation
+tx: symbolic normalized x tangent component equation
+ty: symbolic normalized y tangent component equation
+tx_vals: vector containing solved x tangent components
+ty_vals: vector containing solved y tangent components
+dtx: symbolic derivative of tx
+dty: symbolic derivative of ty
+dt_mag: symbolic tangent magnitude equation
+nx: symbolic normal vector x component
+ny: symbolic normal vector y component
+nx_vals: vector containing solved x normal components
+ny_vals: vector containing solved y normal components
+T: Scalar that defines the total time we want driving the path to take
+t: symbolic equation that defines t with respect to u
+du_dt: scalar derived from t used to convert dx_du to velocity
+v: symbolic equation converting to velocity with respect to time
+d2x_du2: symbolic 2nd derivative of x
+d2y_du2: symbolic 2nd derivative of y
+cross_mag: symbolic equation for magnitude of curvature cross product
+kappa: symbolic equation for curvature
+omega: symbolic rotational velocity
+vr: symbolic right wheel velocity
+vl: symbolic left wheel velocity
+t_vals: vector containing time for plotting
+v_vals: vector containing velocity for plotting
+omega_vals: vector containing angular velocity for graphing
+vr_vals: vector containing right wheel velocity for plotting
+vl_vals: vector containing left wheel velocity for plotting
+%}
 
 
 % PLOTS
