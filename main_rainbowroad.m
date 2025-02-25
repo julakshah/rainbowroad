@@ -13,7 +13,7 @@ clear;
 % WHEEL_BASE: the distance between neato wheels
 % tu_vals: u values to plot tangents and normals at
 % dx_du: symbolic x velocity 
-% dy_du: symbolic y velocityequation equation
+% dy_du: symbolic y velocity equation equation
 % v_mag: symbolic velocity magnitude equation
 % tx: symbolic normalized x tangent component equation
 % ty: symbolic normalized y tangent component equation
@@ -97,8 +97,11 @@ for i = 2:length(tu_vals)-1
     plot(tnx(i),tny(i),'ko','markerfacecolor','k','markersize',5);
     quiver(tnx(i), tny(i), tx_vals(i), ty_vals(i), ...
         AutoScale="off",LineWidth=1.5, Color="r")
+    quiver(tnx(i), tny(i), nx_vals(i), ny_vals(i), ...
+        AutoScale="off",LineWidth=1.5, Color="g")
 
 end
+plot(tnx(1),tny(1),'ko','markerfacecolor','r','markersize',10);
 hold off
 
 %% DEFINE FUNCTIONS
