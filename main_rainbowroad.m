@@ -214,3 +214,20 @@ end
 neatov3.setVelocities(0.0, 0.0);
 neato_data = neatov3.receive();
 neatov3.disconnect()
+%% NEATO COMPARE
+enc_data = neato_data.encoders();
+left_wheel_encoder_list = enc_data(2);
+right_wheel_encoder_list = enc_data(1);
+
+dr = diff(right_wheel_encoder_list);
+dl = diff(left_wheel_encoder_list);
+theta = cumsum((dr - dl) ./ WHEEL_BASE);
+displacemennt = (dr + dl) ./ 2;
+
+x = cumsum(displacemennt .* -sin(theta));
+y = cumsum(displacemennt .* cos(theta));
+
+figure()
+plot(x, y)
+title('X & Y vs. Time')
+axis equal
