@@ -188,7 +188,7 @@ hold off;
 %% NEATO MOVE
 
 % connect to neato
-neatov3.connect(IP_STRING);
+%neatov3.connect(IP_STRING);
 neato_data = neatov3.receive();
 % start the timer
 tic;
@@ -234,14 +234,14 @@ y_exp = cumsum(displacemennt .* sin(theta)); % y position vector
 x_exp = x_exp - 0.33373270416764262492145011235346;
 y_exp = y_exp + 0.97559523268857557885287983301804;
 
-%{
+
 % SOLVE FOR TANGENTS
 % differentiate x and y functions
 dx_exp = diff(x_exp);
 dy_exp = diff(y_exp);
 % get x and y tangent equations
-tx_exp = dx_exp ./ displacemennt;
-ty_exp = dy_exp ./ displacemennt;
+tx_exp = dx_exp ./ displacemennt(2, :);
+ty_exp = dy_exp ./ displacemennt(2, :);
 
 % SOLVE FOR NORMALS
 % differentiate tx and ty
@@ -252,7 +252,7 @@ dt_mag_exp = sqrt(dtx_exp.^2 + dty_exp.^2);
 % get x and y normal equations
 nx_exp = dtx_exp / dt_mag_exp;
 ny_exp = dty_exp / dt_mag_exp;
-%}
+
 figure(1); clf;
 hold on
 axis square
@@ -269,17 +269,17 @@ plot(x_vals(end),y_vals(end),'ko','markerfacecolor','k','markersize',5);
 for i = 2:length(tu_vals)-1
     plot(tnx(i),tny(i),'ko','markerfacecolor','k','markersize',5);
     quiver(tnx(i), tny(i), tx_vals(i), ty_vals(i), ...
-        AutoScale="off",LineWidth=1.5, Color="#00841a")
+        AutoScale="off",LineWidth=1.5, Color="r")
     quiver(tnx(i), tny(i), nx_vals(i), ny_vals(i), ...
         AutoScale="off",LineWidth=1.5, Color="g")
 
 end
 plot(tnx(1),tny(1),'ko','markerfacecolor','r','markersize',10);
 
-plot(x, y, 'r--', LineWidth=2)
+%plot(x, y, 'r--', LineWidth=2)
 
 % for i = 2:length(tx_exp)-1
-%     plot(x_exp(i),y_exp(i),'ko','markerfacecolor','k','markersize',5);
+%     plot(x_exp(i),y_exp(i),'ko','markerfacecolor','b','markersize',10);
 %     quiver(x_exp(i), y_exp(i), tx_exp(i), ty_exp(i), ...
 %         AutoScale="off",LineWidth=1.5, Color="#00841a")
 %     quiver(x_exp(i), y_exp(i), nx_exp(i), ny_exp(i), ...
