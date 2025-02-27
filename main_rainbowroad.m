@@ -103,25 +103,23 @@ y_vals = double(subs(y, u, u_plotting));
 figure(1); clf;
 hold on
 axis square
-axis([-1.5,1.5,-1.5,1.5]);
+axis([-1,2,-1.5,1.5]);
 title("Centerline Plot")
 xlabel("x position")
 ylabel("y position")
 % plot the center line
-plot(x_vals, y_vals, LineWidth=2);
+plot(x_vals, y_vals, LineWidth=2, DisplayName="Robot Centerline");
 % add dots to ends of center line
-plot(x_vals(1),y_vals(1),'ko','markerfacecolor','k','markersize',5);
-plot(x_vals(end),y_vals(end),'ko','markerfacecolor','k','markersize',5);
+plot(x_vals(1),y_vals(1),'ko','markerfacecolor','r','markersize',5, DisplayName="Path Start Point");
+plot(x_vals(end),y_vals(end),'ko','markerfacecolor','k','markersize',5, DisplayName="Path End Point");
 % plot tangent lines except the end points
 for i = 2:length(tu_vals)-1
-    plot(tnx(i),tny(i),'ko','markerfacecolor','k','markersize',5);
     quiver(tnx(i), tny(i), tx_vals(i), ty_vals(i), ...
-        AutoScale="off",LineWidth=1.5, Color="r")
+        AutoScale="off",LineWidth=1.5, Color="r", DisplayName="Tangent Vector")
     quiver(tnx(i), tny(i), nx_vals(i), ny_vals(i), ...
-        AutoScale="off",LineWidth=1.5, Color="g")
-
+        AutoScale="off",LineWidth=1.5, Color="g", DisplayName="Normal Vector")
 end
-plot(tnx(1),tny(1),'ko','markerfacecolor','r','markersize',10);
+legend()
 hold off
 
 %% DEFINE FUNCTIONS
