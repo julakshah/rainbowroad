@@ -59,7 +59,8 @@ u_scope = [0, 3.2];
 
 MAX_WHEEL_SPEED = .3; % m/s
 WHEEL_BASE = .245; % meters
-IP_STRING = '192.00.00.00'
+IP_STRING = '192.168.16.70';
+NEATO_COMAPRE_FLAG = false;
 
 %% PLOT PATH/TANGENT/NORMAL
 
@@ -174,8 +175,8 @@ figure('Position', [700, 100, 600, 400]);
 plot(t_vals, vr_vals, 'b-', 'LineWidth', 2, 'DisplayName', 'Right Wheel');
 hold on;
 plot(t_vals, vl_vals, 'r-', 'LineWidth', 2, 'DisplayName', 'Left Wheel');
-plot([0 T], [max_speed max_speed], 'k--', 'DisplayName', 'Speed Limit');
-plot([0 T], [-max_speed -max_speed], 'k--', 'HandleVisibility', 'off');
+plot([0 T], [MAX_WHEEL_SPEED MAX_WHEEL_SPEED], 'k--', 'DisplayName', 'Speed Limit');
+plot([0 T], [-MAX_WHEEL_SPEED -MAX_WHEEL_SPEED], 'k--', 'HandleVisibility', 'off');
 xlabel('Time (s)'); ylabel('Wheel Velocity (m/s)');
 title('Planned Wheel Velocities');
 legend('Location', 'best');
@@ -187,22 +188,31 @@ hold off;
 %% NEATO MOVE
 
 % connect to neato
-neato3.connect(IP_STRING);
-
+neatov3.connect(IP_STRING);
+neato_data = NaN; %this might have to be changed
 % start the timer
 tic;
 % loop until 60 seconds have passed
 while toc<=60
     % set t_in to the amount of time that has elapsed
     t_in = toc;
-
+     
     % use MATLAB's linear interpolation to approximate
     % vl(t) and vr(t) at t=t_in
     vl_out = interp1(t_vals,vl_vals,t_in);
     vr_out = interp1(t_vals,vr_vals,t_in);
-    
-    neato3.setVelocities(vl_out, vr_out)
+    if isnan(vl_out)
+        vl_out = 0.0;
+    end
+    if isnan(vr_out)
+        vr_out = 0.0;
+    end
+    neatov3.setVelocities(vr_out, vl_out)
+    neato_data = [neato_data; neatov3.receive()];
 end
-
-
+neatov3.setVelocities(0.0, 0.0);
+neato_data = neatov3.receive();
+neatov3.disconnect()
+%% NEATO COMPARE
+% runs if NEATO_COMPARE
 
