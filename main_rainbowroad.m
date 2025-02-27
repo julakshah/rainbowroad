@@ -240,8 +240,8 @@ y_exp = y_exp + 0.97559523268857557885287983301804;
 dx_exp = diff(x_exp);
 dy_exp = diff(y_exp);
 % get x and y tangent equations
-tx_exp = dx_exp ./ displacemennt(2, :);
-ty_exp = dy_exp ./ displacemennt(2, :);
+tx_exp = dx_exp ./ displacemennt(2:end, 1);
+ty_exp = dy_exp ./ displacemennt(2:end, 1);
 
 % SOLVE FOR NORMALS
 % differentiate tx and ty
@@ -250,8 +250,8 @@ dty_exp = diff(ty_exp);
 % find magnitude of T
 dt_mag_exp = sqrt(dtx_exp.^2 + dty_exp.^2);
 % get x and y normal equations
-nx_exp = dtx_exp / dt_mag_exp;
-ny_exp = dty_exp / dt_mag_exp;
+nx_exp = dtx_exp ./ dt_mag_exp;
+ny_exp = dty_exp ./ dt_mag_exp;
 
 figure(1); clf;
 hold on
@@ -278,13 +278,13 @@ plot(tnx(1),tny(1),'ko','markerfacecolor','r','markersize',10);
 
 %plot(x, y, 'r--', LineWidth=2)
 
-% for i = 2:length(tx_exp)-1
-%     plot(x_exp(i),y_exp(i),'ko','markerfacecolor','b','markersize',10);
-%     quiver(x_exp(i), y_exp(i), tx_exp(i), ty_exp(i), ...
-%         AutoScale="off",LineWidth=1.5, Color="#00841a")
-%     quiver(x_exp(i), y_exp(i), nx_exp(i), ny_exp(i), ...
-%         AutoScale="off",LineWidth=1.5, Color="g")
-% end
+for i = 1:3
+    plot(x_exp(42 * i + 24),y_exp(42 * i + 24),'ko','markerfacecolor','b','markersize',10);
+    quiver(x_exp(42 * i + 24), y_exp(42 * i + 24), tx_exp(42 * i + 24), ty_exp(42 * i + 24), ...
+        AutoScale="off",LineWidth=1.5, Color="#00841a", LineStyle="--")
+    quiver(x_exp(42 * i + 24), y_exp(42 * i + 24), nx_exp(42 * i + 24), ny_exp(42 * i + 24), ...
+        AutoScale="off",LineWidth=1.5, Color="g", LineStyle="--")
+end
 
 
 hold off
