@@ -102,11 +102,11 @@ x_vals = double(subs(x, u, u_plotting));
 y_vals = double(subs(y, u, u_plotting));
 figure(1); clf;
 hold on
-axis square
-axis([-1,2,-1.5,1.5]);
+axis equal
+axis([-1,4,-1.5,1.5]);
 title("Centerline Plot")
-xlabel("x position")
-ylabel("y position")
+xlabel("X Position (m)")
+ylabel("Y Position (m)")
 % plot the center line
 plot(x_vals, y_vals, LineWidth=2, DisplayName="Robot Centerline");
 % add dots to ends of center line
@@ -120,12 +120,14 @@ for i = 2:length(tu_vals)-1
         AutoScale="off",LineWidth=1.5, Color="g", DisplayName="Normal Vector")
 end
 legend()
+caption = 'Planned path of Neato with tangent and normal vectors derived derived from Rainbow Road parametric equation';
+text(1.3, -2.25, caption, 'FontSize', 8, 'HorizontalAlignment', 'center');
 hold off
 
 %% DEFINE FUNCTIONS
 
 % Time parameters
-T = 30; % Total time (s), adjust if wheel speeds exceed 0.3 m/s
+T = 16; % Total time (s), adjust if wheel speeds exceed 0.3 m/s
 t = u * T / 3.2;
 du_dt = 3.2 / T;
 
@@ -165,8 +167,8 @@ xlabel('Time (s)'); ylabel('Angular Velocity (rad/s)');
 title('Planned Angular Velocity');
 grid on;
 sgtitle('Neatokart Center of Mass Velocities');
-caption = sprintf('Planned linear speed and angular velocity of the Neatokart over %d s, derived from the Rainbow Road curve.', T);
-text(0, -0.1, caption, 'FontSize', 8, 'HorizontalAlignment', 'center', 'Units', 'normalized');
+caption = sprintf('Linear speed and angular velocity of the Neatokart over %ds, derived from the Rainbow Road curve.', T);
+text(.5, -0.16, caption, 'FontSize', 8, 'HorizontalAlignment', 'center', 'Units', 'normalized');
 
 % Plot wheel velocities
 figure('Position', [700, 100, 600, 400]); clf;
@@ -179,14 +181,14 @@ xlabel('Time (s)'); ylabel('Wheel Velocity (m/s)');
 title('Planned Wheel Velocities');
 legend('Location', 'best');
 grid on;
-caption = sprintf('Left and right wheel velocities over %d s, constrained by ±0.3 m/s, for navigating Rainbow Road.', T);
-text(T/2, -0.45, caption, 'FontSize', 8, 'HorizontalAlignment', 'center');
+caption = sprintf('Left and right wheel velocities derived from angular and linear velocity over %ds, limited to ±0.3 m/s', T);
+text(T/2, -0.25, caption, 'FontSize', 8, 'HorizontalAlignment', 'center');
 hold off;
 
 %% NEATO MOVE
 
 % connect to neato
-%neatov3.connect(IP_STRING);
+neatov3.connect(IP_STRING);
 neato_data = neatov3.receive();
 % start the timer
 tic;
@@ -251,38 +253,35 @@ dt_mag_exp = sqrt(dtx_exp.^2 + dty_exp.^2);
 nx_exp = dtx_exp ./ dt_mag_exp;
 ny_exp = dty_exp ./ dt_mag_exp;
 
-figure(1); clf;
+figure(); clf;
 hold on
-axis square
-axis([-1.5,1.5,-1.5,1.5]);
-title("Comparing Measured and Experimental Path")
-xlabel("x position")
-ylabel("y position")
+axis equal
+axis([-1,4,-1.5,1.5]);
+title("Experimental Vs. Theoretical Path")
+xlabel("X position (m)")
+ylabel("Y Position (m)")
 % plot the center line
-plot(x_vals, y_vals, LineWidth=2);
+plot(x_vals, y_vals, LineWidth=2, DisplayName="Theoretical Path");
 % add dots to ends of center line
-plot(x_vals(1),y_vals(1),'ko','markerfacecolor','k','markersize',5);
-plot(x_vals(end),y_vals(end),'ko','markerfacecolor','k','markersize',5);
+plot(x_vals(1),y_vals(1),'ko','markerfacecolor','r','markersize',5, DisplayName="Path Start Point");
+plot(x_vals(end),y_vals(end),'ko','markerfacecolor','k','markersize',5, DisplayName="Path End Point");
 % plot tangent lines except the end points
 for i = 2:length(tu_vals)-1
-    plot(tnx(i),tny(i),'ko','markerfacecolor','k','markersize',5);
     quiver(tnx(i), tny(i), tx_vals(i), ty_vals(i), ...
-        AutoScale="off",LineWidth=1.5, Color="r")
+        AutoScale="off",LineWidth=1.5, Color="#005000", DisplayName="Tangent Vector")
     quiver(tnx(i), tny(i), nx_vals(i), ny_vals(i), ...
-        AutoScale="off",LineWidth=1.5, Color="g")
-
+        AutoScale="off",LineWidth=1.5, Color="#00cc00", DisplayName="Normal Vector")
 end
-plot(tnx(1),tny(1),'ko','markerfacecolor','r','markersize',10);
 
-%plot(x, y, 'r--', LineWidth=2)
+plot(x_exp, y_exp, 'r--', LineWidth=2, DisplayName="Experimental Path")
 
 for i = 1:3
-    plot(x_exp(42 * i + 24),y_exp(42 * i + 24),'ko','markerfacecolor','b','markersize',10);
     quiver(x_exp(42 * i + 24), y_exp(42 * i + 24), tx_exp(42 * i + 24), ty_exp(42 * i + 24), ...
-        AutoScale="off",LineWidth=1.5, Color="#00841a", LineStyle="--")
+        AutoScale="off",LineWidth=1.5, Color="#009900", LineStyle="--", DisplayName="Experimental Tangent Vector")
     quiver(x_exp(42 * i + 24), y_exp(42 * i + 24), nx_exp(42 * i + 24), ny_exp(42 * i + 24), ...
-        AutoScale="off",LineWidth=1.5, Color="g", LineStyle="--")
+        AutoScale="off",LineWidth=1.5, Color="#cc9900", LineStyle="--", DisplayName="Experimental Normal Vector")
 end
-
-
+legend()
+caption = 'Planned path of Neato compared to Measured path, with tangent and normal vectors at different points';
+text(1.3, -2.25, caption, 'FontSize', 8, 'HorizontalAlignment', 'center');
 hold off
