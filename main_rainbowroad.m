@@ -59,7 +59,7 @@ u_scope = [0, 3.2];
 
 MAX_WHEEL_SPEED = .3; % m/s
 WHEEL_BASE = .245; % meters
-IP_STRING = '192.168.16.70';
+IP_STRING = '192.168.16.57';
 NEATO_COMAPRE_FLAG = false;
 
 %% PLOT PATH/TANGENT/NORMAL
@@ -155,7 +155,7 @@ vr_vals = double(subs(vr, u, u_plotting));
 vl_vals = double(subs(vl, u, u_plotting));
 
 % Plot linear and angular velocities
-figure('Position', [100, 100, 600, 400]);
+figure('Position', [100, 100, 600, 400]); clf;
 subplot(2, 1, 1);
 plot(t_vals, v_vals, 'b-', 'LineWidth', 2);
 xlabel('Time (s)'); ylabel('Linear Speed (m/s)');
@@ -171,7 +171,7 @@ caption = sprintf('Planned linear speed and angular velocity of the Neatokart ov
 text(0, -0.1, caption, 'FontSize', 8, 'HorizontalAlignment', 'center', 'Units', 'normalized');
 
 % Plot wheel velocities
-figure('Position', [700, 100, 600, 400]);
+figure('Position', [700, 100, 600, 400]); clf;
 plot(t_vals, vr_vals, 'b-', 'LineWidth', 2, 'DisplayName', 'Right Wheel');
 hold on;
 plot(t_vals, vl_vals, 'r-', 'LineWidth', 2, 'DisplayName', 'Left Wheel');
@@ -189,7 +189,7 @@ hold off;
 
 % connect to neato
 neatov3.connect(IP_STRING);
-neato_data = NaN; %this might have to be changed
+neato_data = neatov3.receive();
 % start the timer
 tic;
 % loop until 60 seconds have passed
@@ -208,11 +208,9 @@ while toc<=60
         vr_out = 0.0;
     end
     neatov3.setVelocities(vr_out, vl_out)
+
     neato_data = [neato_data; neatov3.receive()];
 end
 neatov3.setVelocities(0.0, 0.0);
 neato_data = neatov3.receive();
 neatov3.disconnect()
-%% NEATO COMPARE
-% runs if NEATO_COMPARE
-
