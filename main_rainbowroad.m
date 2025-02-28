@@ -120,7 +120,7 @@ for i = 2:length(tu_vals)-1
         AutoScale="off",LineWidth=1.5, Color="g", DisplayName="Normal Vector")
 end
 legend()
-caption = 'Planned path of Neato with tangent and normal vectors derived derived from Rainbow Road parametric equation';
+caption = 'Planned path of Neato with tangent and normal vectors derived from Rainbow Road parametric equation';
 text(1.3, -2.25, caption, 'FontSize', 8, 'HorizontalAlignment', 'center');
 hold off
 
