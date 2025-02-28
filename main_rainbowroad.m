@@ -160,7 +160,7 @@ t_in_data = 0;
 % start the timer
 tic;
 % loop until 60 seconds have passed
-while toc<=30
+while toc<=T
     % set t_in to the amount of time that has elapsed
     t_in = toc;
      
@@ -181,10 +181,9 @@ end
 neatov3.setVelocities(0.0, 0.0);
 neatov3.disconnect()
 
-
-%% PLOT PLANNED LINEAR SPEED AND ANGULAR VELOCITY VS. TIME
 %remove starting 0
 t_in_data = t_in_data(2:end);
+%% PLOT PLANNED LINEAR SPEED AND ANGULAR VELOCITY VS. TIME
 neato_data_size = size(neato_data);
 enc_data = zeros(neato_data_size(1), 2);
 for i = 1:length(neato_data)
@@ -228,16 +227,21 @@ ny_exp = dty_exp ./ dt_mag_exp;
 figure('Position', [100, 100, 600, 400]); clf;
 subplot(2, 1, 1);
 hold on
-plot(t_vals, v_vals, 'b-', 'LineWidth', 2);
-plot(displacemennt)
+plot(t_vals, v_vals, 'b-', 'LineWidth', 2, DisplayName='Planned Path');
+plot(t_in_data(2:end), displacemennt(2:end)./diff(t_in_data), 'b--', 'LineWidth', 2, DisplayName='Experimental Path');
 hold off
 xlabel('Time (s)'); ylabel('Linear Speed (m/s)');
 title('Planned Linear Speed');
+legend()
 grid on;
 subplot(2, 1, 2);
-plot(t_vals, omega_vals, 'r-', 'LineWidth', 2);
+hold on;
+plot(t_vals, omega_vals, 'r-', 'LineWidth', 2, DisplayName='Planned Path');
+plot(t_in_data(2:end), diff(theta)./diff(t_in_data), 'r--', 'LineWidth', 2, DisplayName='Experimental Path');
+hold off;
 xlabel('Time (s)'); ylabel('Angular Velocity (rad/s)');
 title('Planned Angular Velocity');
+legend()
 grid on;
 sgtitle('Neatokart Center of Mass Velocities');
 caption = sprintf('Linear speed and angular velocity of the Neatokart over %ds, derived from the Rainbow Road curve.', T);
@@ -247,7 +251,6 @@ text(.5, -0.16, caption, 'FontSize', 8, 'HorizontalAlignment', 'center', 'Units'
 figure('Position', [700, 100, 600, 400]); clf;
 hold on;
 plot(t_vals, vr_vals, 'b-', 'LineWidth', 2, 'DisplayName', 'Right Wheel');
-%plot()
 plot(t_vals, vl_vals, 'r-', 'LineWidth', 2, 'DisplayName', 'Left Wheel');
 plot([0 T], [MAX_WHEEL_SPEED MAX_WHEEL_SPEED], 'k--', 'DisplayName', 'Speed Limit');
 plot([0 T], [-MAX_WHEEL_SPEED -MAX_WHEEL_SPEED], 'k--', 'HandleVisibility', 'off');
@@ -282,9 +285,9 @@ end
 plot(x_exp, y_exp, 'r--', LineWidth=2, DisplayName="Experimental Path")
 
 for i = 1:3
-    quiver(x_exp(42 * i + 24), y_exp(42 * i + 24), tx_exp(42 * i + 24), ty_exp(42 * i + 24), ...
+    quiver(x_exp(20 * i + 15), y_exp(20 * i + 15), tx_exp(20 * i + 15), ty_exp(20 * i + 15), ...
         AutoScale="off",LineWidth=1.5, Color="#009900", LineStyle="--", DisplayName="Experimental Tangent Vector")
-    quiver(x_exp(42 * i + 24), y_exp(42 * i + 24), nx_exp(42 * i + 24), ny_exp(42 * i + 24), ...
+    quiver(x_exp(20 * i + 15), y_exp(20 * i + 15), nx_exp(20 * i + 15), ny_exp(20 * i + 15), ...
         AutoScale="off",LineWidth=1.5, Color="#cc9900", LineStyle="--", DisplayName="Experimental Normal Vector")
 end
 legend()
