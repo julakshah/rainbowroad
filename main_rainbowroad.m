@@ -59,7 +59,7 @@ u_scope = [0, 3.2];
 
 MAX_WHEEL_SPEED = .3; % m/s
 WHEEL_BASE = .245; % meters
-IP_STRING = '192.168.16.57';
+IP_STRING = '192.168.16.114';
 NEATO_COMAPRE_FLAG = false;
 
 %% PLOT PATH/TANGENT/NORMAL
@@ -145,51 +145,18 @@ omega = v .* kappa;
 vr = v + (omega * WHEEL_BASE) / 2;
 vl = v - (omega * WHEEL_BASE) / 2;
 
-%% PLOT PLANNED LINEAR SPEED AND ANGULAR VELOCITY VS. TIME
-
 % Evaluating functions for plotting
 t_vals = double(subs(t, u, u_plotting));
 v_vals = double(subs(v, u, u_plotting));
 omega_vals = double(subs(omega, u, u_plotting));
 vr_vals = double(subs(vr, u, u_plotting));
 vl_vals = double(subs(vl, u, u_plotting));
-
-% Plot linear and angular velocities
-figure('Position', [100, 100, 600, 400]); clf;
-subplot(2, 1, 1);
-plot(t_vals, v_vals, 'b-', 'LineWidth', 2);
-xlabel('Time (s)'); ylabel('Linear Speed (m/s)');
-title('Planned Linear Speed');
-grid on;
-subplot(2, 1, 2);
-plot(t_vals, omega_vals, 'r-', 'LineWidth', 2);
-xlabel('Time (s)'); ylabel('Angular Velocity (rad/s)');
-title('Planned Angular Velocity');
-grid on;
-sgtitle('Neatokart Center of Mass Velocities');
-caption = sprintf('Linear speed and angular velocity of the Neatokart over %ds, derived from the Rainbow Road curve.', T);
-text(.5, -0.16, caption, 'FontSize', 8, 'HorizontalAlignment', 'center', 'Units', 'normalized');
-
-% Plot wheel velocities
-figure('Position', [700, 100, 600, 400]); clf;
-plot(t_vals, vr_vals, 'b-', 'LineWidth', 2, 'DisplayName', 'Right Wheel');
-hold on;
-plot(t_vals, vl_vals, 'r-', 'LineWidth', 2, 'DisplayName', 'Left Wheel');
-plot([0 T], [MAX_WHEEL_SPEED MAX_WHEEL_SPEED], 'k--', 'DisplayName', 'Speed Limit');
-plot([0 T], [-MAX_WHEEL_SPEED -MAX_WHEEL_SPEED], 'k--', 'HandleVisibility', 'off');
-xlabel('Time (s)'); ylabel('Wheel Velocity (m/s)');
-title('Planned Wheel Velocities');
-legend('Location', 'best');
-grid on;
-caption = sprintf('Left and right wheel velocities derived from angular and linear velocity over %ds, limited to ±0.3 m/s', T);
-text(T/2, -0.25, caption, 'FontSize', 8, 'HorizontalAlignment', 'center');
-hold off;
-
 %% NEATO MOVE
 
 % connect to neato
 neatov3.connect(IP_STRING);
 neato_data = neatov3.receive();
+t_in_data = 0;
 % start the timer
 tic;
 % loop until 60 seconds have passed
@@ -208,13 +175,17 @@ while toc<=30
         vr_out = 0.0;
     end
     neatov3.setVelocities(vr_out, vl_out)
-
+    t_in_data = [t_in_data; t_in]
     neato_data = [neato_data; neatov3.receive()];
 end
 neatov3.setVelocities(0.0, 0.0);
 neatov3.disconnect()
-%% NEATO COMPARE
-neato_data_size = size(neato_data)
+
+
+%% PLOT PLANNED LINEAR SPEED AND ANGULAR VELOCITY VS. TIME
+%remove starting 0
+t_in_data = t_in_data(2:end);
+neato_data_size = size(neato_data);
 enc_data = zeros(neato_data_size(1), 2);
 for i = 1:length(neato_data)
     enc_data(i, :) = neato_data(i).encoders();
@@ -252,6 +223,41 @@ dt_mag_exp = sqrt(dtx_exp.^2 + dty_exp.^2);
 % get x and y normal equations
 nx_exp = dtx_exp ./ dt_mag_exp;
 ny_exp = dty_exp ./ dt_mag_exp;
+
+% Plot linear and angular velocities
+figure('Position', [100, 100, 600, 400]); clf;
+subplot(2, 1, 1);
+hold on
+plot(t_vals, v_vals, 'b-', 'LineWidth', 2);
+plot(displacemennt)
+hold off
+xlabel('Time (s)'); ylabel('Linear Speed (m/s)');
+title('Planned Linear Speed');
+grid on;
+subplot(2, 1, 2);
+plot(t_vals, omega_vals, 'r-', 'LineWidth', 2);
+xlabel('Time (s)'); ylabel('Angular Velocity (rad/s)');
+title('Planned Angular Velocity');
+grid on;
+sgtitle('Neatokart Center of Mass Velocities');
+caption = sprintf('Linear speed and angular velocity of the Neatokart over %ds, derived from the Rainbow Road curve.', T);
+text(.5, -0.16, caption, 'FontSize', 8, 'HorizontalAlignment', 'center', 'Units', 'normalized');
+
+% Plot wheel velocities
+figure('Position', [700, 100, 600, 400]); clf;
+hold on;
+plot(t_vals, vr_vals, 'b-', 'LineWidth', 2, 'DisplayName', 'Right Wheel');
+%plot()
+plot(t_vals, vl_vals, 'r-', 'LineWidth', 2, 'DisplayName', 'Left Wheel');
+plot([0 T], [MAX_WHEEL_SPEED MAX_WHEEL_SPEED], 'k--', 'DisplayName', 'Speed Limit');
+plot([0 T], [-MAX_WHEEL_SPEED -MAX_WHEEL_SPEED], 'k--', 'HandleVisibility', 'off');
+xlabel('Time (s)'); ylabel('Wheel Velocity (m/s)');
+title('Planned Wheel Velocities');
+legend('Location', 'best');
+grid on;
+caption = sprintf('Left and right wheel velocities derived from angular and linear velocity over %ds, limited to ±0.3 m/s', T);
+text(T/2, -0.25, caption, 'FontSize', 8, 'HorizontalAlignment', 'center');
+hold off;
 
 figure(); clf;
 hold on
